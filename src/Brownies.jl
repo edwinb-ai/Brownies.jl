@@ -8,5 +8,9 @@ include("potentials.jl")
 export PairwisePotential, PseudoHS, apply!
 include("energy.jl")
 export energy_force!
+include("utils.jl")
+export rng_matrix!
+include("move.jl")
+export move!
 
 end # module
