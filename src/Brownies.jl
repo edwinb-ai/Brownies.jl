@@ -1,5 +1,8 @@
 module Brownies
 
-greet() = print("Hello World!")
+import Plots.scatter
+
+include("types.jl")
+export SimulationSystem, Parameters
 
 end # module
