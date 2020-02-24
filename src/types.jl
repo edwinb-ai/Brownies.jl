@@ -17,13 +17,6 @@ mutable struct ParticleSystem{T<:AbstractArray}
     forces::T
 end
 
-function ParticleSystem(N::V, ::Type{T}) where {T<:AbstractFloat,V<:Integer}
-    num_coord = 3
-    pos = zeros(T, N, num_coord)
-    forces = zeros(T, N, num_coord)
-    return ParticleSystem{AbstractArray{T}}(pos, forces)
-end
-
 function ParticleSystem(
     N::V,
     M::V,
@@ -95,6 +88,7 @@ end
 
 function SimulationSystem(
     params::Parameters,
+    dims::Integer,
     ::Type{T},
 ) where {T<:AbstractFloat}
     # Assign density for a 3D system
@@ -102,7 +96,7 @@ function SimulationSystem(
     boxl = ∛(params.N / ρ)
     rc = boxl * 0.5
     # Build a system of particles with the total number of particles
-    psys = ParticleSystem(params.N, T)
+    psys = ParticleSystem(params.N, dims, T)
     return SimulationSystem{T}(params, T(ρ), T(boxl), T(rc), psys, T(0.0))
 end
 
