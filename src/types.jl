@@ -12,22 +12,23 @@ A handy type to manipulate the positions of a set of given particles.
     directions, in rectangular coordinates
 """
 
-mutable struct ParticleSystem{T <: AbstractArray}
+mutable struct ParticleSystem{T<:AbstractArray}
     positions::T
     forces::T
 end
 
-function ParticleSystem(N::V, ::Type{T}) where {T <: AbstractFloat,V <: Integer}
+function ParticleSystem(N::V, ::Type{T}) where {T<:AbstractFloat,V<:Integer}
     num_coord = 3
     pos = zeros(T, N, num_coord)
     forces = zeros(T, N, num_coord)
     return ParticleSystem{AbstractArray{T}}(pos, forces)
 end
 
-function ParticleSystem(N::V,
+function ParticleSystem(
+    N::V,
     M::V,
     ::Type{T},
-) where {T <: AbstractFloat,V <: Integer}
+) where {T<:AbstractFloat,V<:Integer}
     pos = zeros(T, N, M)
     forces = zeros(T, N, M)
     return ParticleSystem{AbstractArray{T}}(pos, forces)
@@ -35,7 +36,7 @@ end
 
 """
 """
-mutable struct Parameters{U <: AbstractFloat,V <: Integer}
+mutable struct Parameters{U<:AbstractFloat,V<:Integer}
     ϕ::U
     kT::U
     N::V
@@ -44,7 +45,7 @@ mutable struct Parameters{U <: AbstractFloat,V <: Integer}
 end
 
 # Just define packing fraction, temperature and time step
-function Parameters(ϕ, kT, τ, ::Type{U}) where {U <: AbstractFloat}
+function Parameters(ϕ, kT, τ, ::Type{U}) where {U<:AbstractFloat}
     convert(U, ϕ)
     convert(U, kT)
     convert(U, τ)
@@ -52,23 +53,25 @@ function Parameters(ϕ, kT, τ, ::Type{U}) where {U <: AbstractFloat}
 end
 
 # Keep default seed, define total number of particles
-function Parameters(ϕ,
-    N::V,
+function Parameters(
+    ϕ,
     kT,
+    N::Integer,
     τ,
     ::Type{U},
-) where {U <: AbstractFloat,V <: Integer}
+) where {U<:AbstractFloat,V<:Integer}
     return Parameters{U,Integer}(U(ϕ), U(kT), N, U(τ), 393216)
 end
 
 # Define a different seed
-function Parameters(ϕ,
-    N::V,
+function Parameters(
+    ϕ,
     kT,
+    N::Integer,
     τ,
-    s::V,
+    s::Integer,
     ::Type{U},
-) where {U <: AbstractFloat,V <: Integer}
+) where {U<:AbstractFloat,V<:Integer}
     return Parameters{U,Integer}(U(ϕ), U(kT), N, U(τ), s)
 end
 
@@ -81,7 +84,7 @@ These values are computed through the `Parameters` type.
 # Fields
 - `ρ::U`: the packing fraction of the system
 """
-mutable struct SimulationSystem{U <: AbstractFloat}
+mutable struct SimulationSystem{U<:AbstractFloat}
     params::Parameters
     ρ::U
     boxl::U
@@ -90,9 +93,10 @@ mutable struct SimulationSystem{U <: AbstractFloat}
     energy::U
 end
 
-function SimulationSystem(params::Parameters,
+function SimulationSystem(
+    params::Parameters,
     ::Type{T},
-) where {T <: AbstractFloat}
+) where {T<:AbstractFloat}
     # Assign density for a 3D system
     ρ = params.ϕ * 6.0 / π
     boxl = ∛(params.N / ρ)
