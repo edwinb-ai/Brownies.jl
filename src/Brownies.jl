@@ -12,5 +12,7 @@ include("utils.jl")
 export rng_matrix!
 include("move.jl")
 export move!
+include("algorithms/ermak.jl")
+export ermak!
 
 end # module
