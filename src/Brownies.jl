@@ -1,5 +1,6 @@
 module Brownies
 
+using JLD2
 import Plots.scatter
 
 include("types.jl")
