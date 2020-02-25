@@ -1,6 +1,10 @@
 module Brownies
 
 using JLD2
+using UnPack
+using Random
+using RandomNumbers.PCG
+using RandomNumbers.Xorshifts
 import Plots.scatter
 
 include("types.jl")
@@ -15,5 +19,7 @@ include("move.jl")
 export move!
 include("algorithms/ermak.jl")
 export ermak!
+include("configurations.jl")
+export initialize!
 
 end # module

@@ -84,6 +84,7 @@ mutable struct SimulationSystem{U<:AbstractFloat}
     rc::U
     system::ParticleSystem
     energy::U
+    dims::Integer
 end
 
 function SimulationSystem(
@@ -97,7 +98,7 @@ function SimulationSystem(
     rc = boxl * 0.5
     # Build a system of particles with the total number of particles
     psys = ParticleSystem(params.N, dims, T)
-    return SimulationSystem{T}(params, T(ρ), T(boxl), T(rc), psys, T(0.0))
+    return SimulationSystem{T}(params, T(ρ), T(boxl), T(rc), psys, T(0.0), dims)
 end
 
 """
