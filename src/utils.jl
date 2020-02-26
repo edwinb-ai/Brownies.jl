@@ -23,13 +23,19 @@ function rng_matrix!(rnd_matrix::AbstractArray, rng_list::AbstractArray)
     end
 end
 
-function savetofile(s::SimulationSystem, energies)
+function savetofile(s::SimulationSystem, energies; move = false)
     # Save positions and forces
     @unpack positions, forces = s.system
     @save "positions-$(s.params.ϕ)-$(s.params.N).jld2" positions
     @save "forces-$(s.params.ϕ)-$(s.params.N).jld2" forces
     # Save the computed energies as well
     @save "energy-$(s.params.ϕ)-$(s.params.N).jld2" energies
+    if move
+        @save "positions-$(s.params.ϕ)-$(s.params.N)-average.jld2" positions
+        @save "forces-$(s.params.ϕ)-$(s.params.N)-average.jld2" forces
+        # Save the computed energies as well
+        @save "energy-$(s.params.ϕ)-$(s.params.N)-average.jld2" energies
+    end
 end
 
 """

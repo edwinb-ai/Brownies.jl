@@ -1,4 +1,4 @@
-function rdf(
+function _rdf!(
     positions::AbstractArray,
     boxl::AbstractFloat,
     gofr::AbstractArray,
@@ -18,10 +18,9 @@ function rdf(
             yij -= boxl * round(yij / boxl)
             zij -= boxl * round(zij / boxl)
 
-            rij2 = xij * xij + yij * yij + zij * zij
+            rij2 = sqrt(xij * xij + yij * yij + zij * zij)
 
             if rij2 < rc
-                rij2 = √rij2
                 nbin = round(rij2 / dr) + 1
                 nbin = Int(nbin)
                 if nbin <= nm
@@ -32,17 +31,36 @@ function rdf(
     end
 end
 
-function normalize(
+function _normalize!(
     gofr::AbstractArray,
     nm::Integer,
     dr::AbstractFloat,
-    cnst
+    cnst,
+    N,
+    nstep,
 )
     for i = 1:nm
-        rpos[i, 1] = dr * (i - 0.5)
-        r_lo = (i - 1) * dr
-        r_hi = r_lo + dr
-        h_id = cnst * (r_hi^3 - r_lo^3)
-        gofr[i, 2] /= h_id
+        gofr[i, 1] = dr * (i - 1.0)
+        dv = 4.0 * π * gofr[i, 1]^2 * dr
+        gofr[i, 2] /= dv * nstep * N
     end
+end
+
+function compute_rdf!(grobject::PairDistributionFunction, s::SimulationSystem)
+    _rdf!(
+        s.system.positions,
+        s.boxl,
+        grobject.gofr,
+        s.rc,
+        grobject.dr,
+        grobject.nm,
+    )
+    _normalize!(
+        grobject.gofr,
+        grobject.nm,
+        grobject.dr,
+        grobject.norm_const,
+        s.params.N,
+        grobject.naverage,
+    )
 end

@@ -37,9 +37,7 @@ function _compute_energy!(
     positions::AbstractArray,
     forces::AbstractArray,
     params::NamedTuple,
-    pot::PairwisePotential;
-    rdf = false,
-    gr = nothing,
+    pot::PairwisePotential,
 )
     # Initialize necessary variables
     energy = zero(params.rc2)
@@ -67,7 +65,6 @@ function _compute_energy!(
                 u_pair, f_pair = apply!(pot, rij2)
                 _add_forces!((fx, fy, fz), (xij, yij, zij), i, j, f_pair, rij2)
                 energy += u_pair
-                # Compute the radial distribution function
             end
         end
     end
