@@ -31,3 +31,14 @@ function savetofile(s::SimulationSystem, energies)
     # Save the computed energies as well
     @save "energy-$(s.params.ϕ)-$(s.params.N).jld2" energies
 end
+
+"""
+    Extend the scatter method from Plots to enable inspection
+of the system.
+"""
+function scatter(s::SimulationSystem)
+    x = view(s.system.positions, :, 1)
+    y = view(s.system.positions, :, 2)
+    z = view(s.system.positions, :, 3)
+    scatter(x, y, z)
+end

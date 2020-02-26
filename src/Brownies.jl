@@ -21,5 +21,7 @@ include("algorithms/ermak.jl")
 export ermak!
 include("configurations.jl")
 export initialize!
+include("observables/rdf.jl")
+export rdf, normalize
 
 end # module

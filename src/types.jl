@@ -101,13 +101,26 @@ function SimulationSystem(
     return SimulationSystem{T}(params, T(ρ), T(boxl), T(rc), psys, T(0.0), dims)
 end
 
-"""
-    Overload the scatter method from Plots to enable inspection
-of the system.
-"""
-function scatter(s::SimulationSystem)
-    x = view(s.system.positions, :, 1)
-    y = view(s.system.positions, :, 2)
-    z = view(s.system.positions, :, 3)
-    scatter(x, y, z)
+abstract type Structure end
+mutable struct PairDistributionFunction <: Structure
+    gofr::AbstractArray
+    nm::Integer
+    dr::AbstractFloat
+    naverage::AbstractFloat
+    norm_const::AbstractFloat
+end
+
+const grfunc = PairDistributionFunction
+
+function PairDistributionFunction(s::SimulationSystem, nm::Integer)
+    normalizing_constant = 4.0 * π * s.ρ / 3.0
+    gofr = zeros(typeof(s.ρ), (nm, nm))
+    dr = s.rc / nm
+    return PairDistributionFunction(
+        gofr,
+        nm,
+        dr,
+        zero(s.ρ),
+        normalizing_constant,
+    )
 end
