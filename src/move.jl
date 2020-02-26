@@ -21,6 +21,7 @@ function _move_loop!(
             energies[idx] = total_energy
         end
     end
+    return energy_force!(positions, forces, params, pot)
 end
 
 function move!(
@@ -50,7 +51,7 @@ function move!(
         rc2 = s.rc * s.rc,
         random_matrix = random_matrix,
         rng_list = rng_list,
-        τ = s.params.τ
+        τ = s.params.τ,
     )
 
     # Check first energy
@@ -59,7 +60,7 @@ function move!(
     println("First energy ", total_energy)
 
     # Move the particles !
-    _move_loop!(N, positions, forces, pot, energies, interval, params)
+    total_energy = _move_loop!(N, positions, forces, pot, energies, interval, params)
 
     # Save all relevant values
     s.energy = total_energy

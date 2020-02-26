@@ -21,18 +21,18 @@ function PseudoHS(λ::T, temp::T) where {T<:AbstractFloat}
     return _pseudoHS(λ, convert(T, 1.0), temp)
 end
 
-@inline function _potential_func(
-    x::T,
+function _potential_func(
+    x,
     λ::T,
     a::T,
     temp::T,
 ) where {T<:AbstractFloat}
-    energy = ((a / temp) * (x^-λ - x^-(λ - 1.0))) + (1.0 / temp)
-    return energy
+    energy = (a / temp) * (x^-λ - x^-(λ - 1.0))
+    return energy + (1.0 / temp)
 end
 
-@inline function _force_func(x::T, λ::T, a::T, temp::T) where {T<:AbstractFloat}
-    force = (λ * x^-(λ + 1.0)) - (λ - 1.0) * x^-λ
+function _force_func(x, λ::T, a::T, temp::T) where {T<:AbstractFloat}
+    force = (λ * x^-(λ + 1.0)) - ((λ - 1.0) * x^-λ)
     return force * (a / temp)
 end  # function _force_func
 

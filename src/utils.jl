@@ -17,12 +17,9 @@ function _create_rngs(num_rngs::Integer; seed::Integer = nothing)
 end
 
 function rng_matrix!(rnd_matrix::AbstractArray, rng_list::AbstractArray)
-    N, M = size(rnd_matrix)
     rnd_type = eltype(rnd_matrix)
-    for i = 1:M
-        @inbounds for j = 1:N
-            rnd_matrix[j, i] = randn(rng_list[i], rnd_type)
-        end
+    for i in axes(rnd_matrix, 2)
+        rnd_matrix[:, i] = randn(rng_list[i], rnd_type, size(rnd_matrix, 1))
     end
 end
 

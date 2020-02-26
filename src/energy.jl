@@ -7,8 +7,8 @@ function _add_forces!(
     rp::AbstractFloat,
 )
     @inbounds for (k, c) in zip(p, f)
-        @fastmath c[idx] += (fp * k) / rp
-        @fastmath c[jdx] -= (fp * k) / rp
+        c[idx] += (fp * k) / rp
+        c[jdx] -= (fp * k) / rp
     end
 end
 
@@ -50,7 +50,7 @@ function _compute_energy!(
     fz = view(forces, :, 3)
 
     for i = 1:params.N-1
-        @inbounds @fastmath for j = (i+1):params.N
+        @inbounds for j = (i+1):params.N
             (xij, yij, zij, rij2) = _compute_distance(
                 x,
                 y,

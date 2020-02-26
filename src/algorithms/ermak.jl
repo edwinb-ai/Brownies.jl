@@ -6,9 +6,8 @@ function _ermak_loop!(
     boxl::AbstractFloat;
     pbc::Bool = true,
 )
-    N = size(pos, 1)
     for j  = axes(pos, 2)
-        @inbounds @fastmath for i = 1:N
+        @inbounds for i = axes(pos, 1)
             pos[i, j] += (forces[i, j] * ttime) + rnd_matrix[i, j]
             if pbc
                 pos[i, j] -= boxl * round(pos[i, j] / boxl)
@@ -29,4 +28,8 @@ function ermak!(
     𝝈 = oftype(ttime, 𝝈)
     rnd_matrix .*= 𝝈
     _ermak_loop!(positions, forces, rnd_matrix, ttime, boxl; pbc = pbc)
+    # @. positions += (forces * ttime) + rnd_matrix
+    # if pbc
+    #     @. positions -= boxl * round(positions - boxl)
+    # end
 end
