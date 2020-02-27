@@ -110,7 +110,7 @@ mutable struct PairDistributionFunction <: Structure
     norm_const::AbstractFloat
 end
 
-function PairDistributionFunction(s::SimulationSystem, nm::Integer, nave)
+function PairDistributionFunction(s::SimulationSystem, nm::Integer)
     normalizing_constant = 4.0 * π * s.ρ
     gofr = zeros(typeof(s.ρ), (nm, 2))
     dr = s.rc / nm
@@ -118,7 +118,7 @@ function PairDistributionFunction(s::SimulationSystem, nm::Integer, nave)
         gofr,
         nm,
         dr,
-        nave,
+        0.0,
         normalizing_constant,
     )
 end

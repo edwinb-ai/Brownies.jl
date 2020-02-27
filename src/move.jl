@@ -36,6 +36,52 @@ function _move_loop!(
     end
 end
 
+function _move_rdf!(
+    N::Integer,
+    positions::AbstractArray,
+    forces::AbstractArray,
+    pot::PairwisePotential,
+    energies::AbstractArray,
+    interval::Integer,
+    params,
+    gofr;
+    average = false,
+)
+    naverage = 0
+    # * Main loop
+    for i = 1:N
+        # Always re-compute random numbers
+        rng_matrix!(params.random_matrix, params.rng_list)
+        # Move particles and update positions
+        ermak!(positions, forces, params.τ, params.boxl, params.random_matrix)
+        # Re-compute the energy and forces from the system
+        total_energy = energy_force!(
+            positions,
+            forces,
+            params,
+            pot;
+            rdf = true,
+            gofr = gofr,
+        )
+        if i % interval == 0
+            @show total_energy
+            idx = Int(i / interval)
+            energies[idx] = total_energy
+        end
+        if average
+            if i % 100 == 0
+                naverage += 1
+            end
+        end
+    end
+    total_energy = energy_force!(positions, forces, params, pot)
+    if average
+        return total_energy, naverage
+    else
+        return total_energy
+    end
+end
+
 function thermalize!(
     N::Integer,
     s::SimulationSystem,
@@ -118,9 +164,19 @@ function move!(
     )
     #
     if gdr
-        total_energy, naverage =
-            _move_loop!(N, positions, forces, pot, energies, interval, params)
-        gfunc = PairDistributionFunction(s, nm, naverage)
+        gfunc = PairDistributionFunction(s, nm)
+        total_energy, naverage = _move_rdf!(
+            N,
+            positions,
+            forces,
+            pot,
+            energies,
+            interval,
+            params,
+            gfunc;
+            average = true,
+        )
+        gfunc.naverage = naverage
         compute_rdf!(gfunc, s)
         if tofiles
             @save "gr-$(s.params.ϕ)-$(s.params.N).jld2" gfunc

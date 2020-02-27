@@ -1,3 +1,5 @@
+const pi4 = 4.0 * π
+
 function _rdf!(
     positions::AbstractArray,
     boxl::AbstractFloat,
@@ -41,20 +43,20 @@ function _normalize!(
 )
     for i = 1:nm
         gofr[i, 1] = dr * (i - 1.0)
-        dv = 4.0 * π * gofr[i, 1]^2 * dr
-        gofr[i, 2] /= dv * nstep * N
+        dv = pi4 .* gofr[i, 1].^2 .* dr
+        gofr[i, 2] ./= dv .* nstep .* N
     end
 end
 
 function compute_rdf!(grobject::PairDistributionFunction, s::SimulationSystem)
-    _rdf!(
-        s.system.positions,
-        s.boxl,
-        grobject.gofr,
-        s.rc,
-        grobject.dr,
-        grobject.nm,
-    )
+    # _rdf!(
+    #     s.system.positions,
+    #     s.boxl,
+    #     grobject.gofr,
+    #     s.rc,
+    #     grobject.dr,
+    #     grobject.nm,
+    # )
     _normalize!(
         grobject.gofr,
         grobject.nm,
