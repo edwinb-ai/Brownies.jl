@@ -30,7 +30,8 @@ function _compute_distance(
 
     rij2 = xij * xij + yij * yij + zij * zij
 
-    st_positions = @SVector [xij, yij, zij]
+    # st_positions = @SVector [xij, yij, zij]
+    st_positions = (xij, yij, zij)
 
     return st_positions, rij2
 end
@@ -47,7 +48,7 @@ function _compute_energy!(
     params::NamedTuple,
     pot::PairwisePotential;
     rdfobj = nothing,
-    zfactor = false,
+    zfactor = nothing,
 )
     # Initialize necessary variables
     energy = zero(params.rc2)
@@ -72,7 +73,11 @@ function _compute_energy!(
                     simple_rdf!(rdfobj, rij2)
                 end
                 if !isnothing(zfactor)
-                    _compressibilityz(static_positions, f_pair, rij2, zfactor.zval)
+                    # tmp_sum = @. (static_positions^2.0 * -f_pair) / rij2
+                    # zfactor.zval += sum(tmp_sum)
+                    for p in static_positions
+                        zfactor.zval += (p * -f_pair) / rij2
+                    end
                 end
             end
         end
