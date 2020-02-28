@@ -11,6 +11,8 @@ include("types.jl")
 export SimulationSystem, Parameters, PairDistributionFunction
 include("potentials.jl")
 export PairwisePotential, PseudoHS, apply!
+include("observables/rdf.jl")
+export compute_rdf!, simple_rdf!
 include("energy.jl")
 export energy_force!
 include("utils.jl")
@@ -21,7 +23,5 @@ include("algorithms/ermak.jl")
 export ermak!
 include("configurations.jl")
 export initialize!
-include("observables/rdf.jl")
-export compute_rdf!
 
 end # module

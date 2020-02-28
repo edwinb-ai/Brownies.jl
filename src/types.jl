@@ -122,3 +122,9 @@ function PairDistributionFunction(s::SimulationSystem, nm::Integer)
         normalizing_constant,
     )
 end
+
+abstract type Thermodynamics end
+mutable struct ZFactor
+    zval::AbstractFloat
+    naverage::AbstractFloat
+end
