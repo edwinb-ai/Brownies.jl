@@ -123,6 +123,21 @@ function PairDistributionFunction(s::SimulationSystem, nm::Integer)
     )
 end
 
+mutable struct StructureFactor
+    sq::AbstractArray
+    dq::AbstractFloat
+    nm::AbstractFloat
+    naverage::AbstractFloat
+    norm_const::AbstractFloat
+end
+
+function StructureFactor(s::SimulationSystem, rdf::PairDistributionFunction)
+    normalizing_constant = 4.0 * π * s.ρ
+    sq = zeros(typeof(s.ρ), (rdf.nm, 2))
+    dq = π / s.rc
+    return StructureFactor(sq, dq, rdf.nm, rdf.naverage, normalizing_constant)
+end
+
 abstract type Thermodynamics end
 mutable struct ZFactor
     zval::AbstractFloat

@@ -30,16 +30,19 @@ function _compute_distance(
 
     rij2 = xij * xij + yij * yij + zij * zij
 
-    # st_positions = @SVector [xij, yij, zij]
-    st_positions = (xij, yij, zij)
+    st_positions = @SVector [xij, yij, zij]
 
     return st_positions, rij2
 end
 
-function _compressibilityz(pos, fp::AbstractFloat, rij::AbstractFloat, total_sum)
-    for p in pos
-        total_sum += (p^2 * -fp) / rij
-    end
+function _compressibilityz(
+    pos::StaticVector,
+    fp::AbstractFloat,
+    rij::AbstractFloat,
+    zfactor::ZFactor,
+)
+    tmp_sum = @. (pos^2.0 * -fp) / rij
+    zfactor.zval += sum(tmp_sum)
 end
 
 function _compute_energy!(
@@ -73,11 +76,7 @@ function _compute_energy!(
                     simple_rdf!(rdfobj, rij2)
                 end
                 if !isnothing(zfactor)
-                    # tmp_sum = @. (static_positions^2.0 * -f_pair) / rij2
-                    # zfactor.zval += sum(tmp_sum)
-                    for p in static_positions
-                        zfactor.zval += (p * -f_pair) / rij2
-                    end
+                    _compressibilityz(static_positions, -f_pair, rij2, zfactor)
                 end
             end
         end
