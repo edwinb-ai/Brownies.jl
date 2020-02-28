@@ -1,6 +1,6 @@
 function _add_forces!(
     f::Tuple,
-    p::Tuple,
+    p,
     idx::Integer,
     jdx::Integer,
     fp::AbstractFloat,
@@ -33,12 +33,10 @@ function _compute_distance(
     return (xij, yij, zij, rij2)
 end
 
-function _compressibilityz(pos::Tuple, fp::AbstractFloat, rij::AbstractFloat)
-    total_sum = 0.0
+function _compressibilityz(pos, fp::AbstractFloat, rij::AbstractFloat, total_sum)
     for p in pos
-        total_sum += (p^2 * fp) / rij
+        total_sum += (p^2 * -fp) / rij
     end
-    return total_sum
 end
 
 function _compute_energy!(
@@ -61,19 +59,20 @@ function _compute_energy!(
 
     for i = 1:params.N-1
         @inbounds @fastmath for j = (i+1):params.N
-            (xij, yij, zij, rij2) =
-                _compute_distance(x, y, z, i, j, params.boxl)
+            (xij, yij, zij, rij2) = _compute_distance(x, y, z, i, j, params.boxl)
+            static_positions = @SVector [xij, yij, zij]
+            static_forces = @SVector []
 
             if rij2 < params.rc2
                 rij2 = √rij2
                 u_pair, f_pair = apply!(pot, rij2)
-                _add_forces!((fx, fy, fz), (xij, yij, zij), i, j, f_pair, rij2)
+                _add_forces!((fx, fy, fz), static_positions, i, j, f_pair, rij2)
                 energy += u_pair
                 if !isnothing(rdfobj)
                     simple_rdf!(rdfobj, rij2)
                 end
                 if !isnothing(zfactor)
-                    zfactor.zvalue = _compressibilityz((xij, yij, zij), f_pair, rij2)
+                    _compressibilityz(static_positions, f_pair, rij2)
                 end
             end
         end
@@ -91,12 +90,6 @@ function energy_force!(
 )
     # Retrieve data from the system
     fill!(forces, zero(params.boxl))
-    energy = _compute_energy!(
-        positions,
-        forces,
-        params,
-        pot;
-        rdfobj = gofr,
-        zfactor = zfactor,
-    )
+    energy =
+        _compute_energy!(positions, forces, params, pot; rdfobj = gofr, zfactor = zfactor)
 end

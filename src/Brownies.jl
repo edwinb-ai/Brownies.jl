@@ -5,6 +5,7 @@ using UnPack
 using Random
 using RandomNumbers.PCG
 using RandomNumbers.Xorshifts
+using StaticArrays
 import Plots.scatter
 
 include("types.jl")

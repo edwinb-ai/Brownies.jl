@@ -124,3 +124,30 @@ function move!(
         @save "gr-$(s.ϕ)-$(s.params.N).jld2" grobject.gofr
     end
 end
+function move!(
+    N::Integer,
+    s::SimulationSystem,
+    pot::PairwisePotential,
+    zfactor::ZFactor;
+    interval = 1000,
+    tofiles = false,
+)
+    # Retrieve system information
+    @unpack positions, forces = s.system
+    (energies, params) = _prepare(s, N, interval)
+    _move_loop!(
+        N,
+        positions,
+        forces,
+        pot,
+        energies,
+        interval,
+        params;
+        zfactor = zfactor,
+    )
+    @show zfactor.zval
+    zfactor.zval = 1.0 - (zfactor.zval / (3.0 * zfactor.naverage * s.params.N))
+    if tofiles
+        savetofile(s, energies; move = true)
+    end
+end
