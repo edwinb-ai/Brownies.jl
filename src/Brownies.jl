@@ -8,7 +8,7 @@ using RandomNumbers.Xorshifts
 import Plots.scatter
 
 include("types.jl")
-export SimulationSystem, Parameters, PairDistributionFunction
+export SimulationSystem, Parameters, PairDistributionFunction, ZFactor
 include("potentials.jl")
 export PairwisePotential, PseudoHS, apply!
 include("observables/rdf.jl")

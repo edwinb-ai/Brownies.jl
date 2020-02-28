@@ -14,7 +14,7 @@ function _normalize!(
     N,
     nstep,
 )
-    for i = 1:nm
+    for i = 2:nm
         gofr[i, 1] = dr * (i - 1.0)
         dv = cnst * gofr[i, 1]^2 * dr
         gofr[i, 2] /= dv * nstep * N

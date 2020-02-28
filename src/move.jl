@@ -6,7 +6,8 @@ function _move_loop!(
     energies::AbstractArray,
     interval::Integer,
     params;
-    rdf = nothing
+    rdf = nothing,
+    zfactor = nothing,
 )
     # * Main loop
     for i = 1:N
@@ -15,11 +16,15 @@ function _move_loop!(
         # Move particles and update positions
         ermak!(positions, forces, params.τ, params.boxl, params.random_matrix)
         # Re-compute the energy and forces from the system
-        if isnothing(rdf)
+
+        if isnothing(rdf) & isnothing(zfactor)
             total_energy = energy_force!(positions, forces, params, pot)
-        else
+        elseif !isnothing(rdf)
             total_energy = energy_force!(positions, forces, params, pot; gofr = rdf)
+        elseif !isnothing(zfactor)
+            total_energy = energy_force!(positions, forces, params, pot; zfactor = zfactor)
         end
+
         if i % interval == 0
             @show total_energy
             idx = Int(i / interval)
@@ -69,12 +74,13 @@ function move!(
     end
 end
 
-function move!(N::Integer,
-s::SimulationSystem,
-pot::PairwisePotential,
-grobject::PairDistributionFunction;
-interval = 1000,
-tofiles = false,
+function move!(
+    N::Integer,
+    s::SimulationSystem,
+    pot::PairwisePotential,
+    grobject::PairDistributionFunction;
+    interval = 1000,
+    tofiles = false,
 )
     # Retrieve system information
     @unpack positions, forces = s.system
@@ -83,7 +89,38 @@ tofiles = false,
     grobject.naverage = N
     compute_rdf!(grobject, s)
     if tofiles
-        savetofile(s, energies)
+        savetofile(s, energies; move = true)
         @save "gr-$(s.ρ)-$(s.params.N).jld2" grobject.gofr
+    end
+end
+
+function move!(
+    N::Integer,
+    s::SimulationSystem,
+    pot::PairwisePotential,
+    grobject::PairDistributionFunction,
+    zfactor::ZFactor;
+    interval = 1000,
+    tofiles = false,
+)
+    # Retrieve system information
+    @unpack positions, forces = s.system
+    (energies, params) = _prepare(s, N, interval)
+    _move_loop!(
+        N,
+        positions,
+        forces,
+        pot,
+        energies,
+        interval,
+        params;
+        rdf = grobject,
+        zfactor = zfactor,
+    )
+    grobject.naverage = N
+    compute_rdf!(grobject, s)
+    if tofiles
+        savetofile(s, energies; move = true)
+        @save "gr-$(s.ϕ)-$(s.params.N).jld2" grobject.gofr
     end
 end
