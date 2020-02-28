@@ -78,11 +78,12 @@ tofiles = false,
 )
     # Retrieve system information
     @unpack positions, forces = s.system
-    (renergies, params) = _prepare(s, N, interval)
-    _move_loop!(N, positions, forces, potential, energies, interval, params; rdf = grobject)
+    (energies, params) = _prepare(s, N, interval)
+    _move_loop!(N, positions, forces, pot, energies, interval, params; rdf = grobject)
+    grobject.naverage = N
     compute_rdf!(grobject, s)
     if tofiles
         savetofile(s, energies)
-        @save "gr-$(s.ρ)-$(s.N).jld2" grobject.gofr
+        @save "gr-$(s.ρ)-$(s.params.N).jld2" grobject.gofr
     end
 end
