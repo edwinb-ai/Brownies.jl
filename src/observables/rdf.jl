@@ -10,9 +10,9 @@ function _normalize!(
     gofr::AbstractArray,
     nm::Integer,
     dr::AbstractFloat,
-    cnst,
-    N,
-    nstep,
+    cnst::AbstractFloat,
+    N::Real,
+    nstep::Real,
 )
     for i = 2:nm
         gofr[i, 1] = dr * (i - 1.0)

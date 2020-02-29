@@ -126,7 +126,7 @@ end
 mutable struct StructureFactor
     sq::AbstractArray
     dq::AbstractFloat
-    nm::AbstractFloat
+    nm::Integer
     naverage::AbstractFloat
     norm_const::AbstractFloat
 end

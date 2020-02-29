@@ -9,7 +9,7 @@ using StaticArrays
 import Plots.scatter
 
 include("types.jl")
-export SimulationSystem, Parameters, PairDistributionFunction, ZFactor
+export SimulationSystem, Parameters, PairDistributionFunction, ZFactor, StructureFactor
 include("potentials.jl")
 export PairwisePotential, PseudoHS, apply!
 include("observables/rdf.jl")
@@ -25,5 +25,6 @@ export ermak!
 include("configurations.jl")
 export initialize!
 include("observables/structure.jl")
+export compute_structure!
 
 end # module

@@ -8,4 +8,6 @@ using Test
     # TODO: utils.jl
     # TODO: move.jl
     # TODO: algorithms/ermak.jl
+    # TODO: observables/rdf.jl
+    include("structuretests.jl")
 end
