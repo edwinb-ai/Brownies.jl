@@ -8,21 +8,39 @@ function _move_loop!(
     params;
     rdf = nothing,
     zfactor = nothing,
+    msd = nothing,
 )
     # * Main loop
     for i = 1:N
         # Always re-compute random numbers
         rng_matrix!(params.random_matrix, params.rng_list)
-        # Move particles and update positions
-        ermak!(positions, forces, params.τ, params.boxl, params.random_matrix)
-        # Re-compute the energy and forces from the system
 
-        if isnothing(rdf) & isnothing(zfactor)
+        if !isnothing(msd)
+            ermak!(
+                positions,
+                forces,
+                params.τ,
+                params.boxl,
+                params.random_matrix;
+                pbc = false,
+            )
             total_energy = energy_force!(positions, forces, params, pot)
-        elseif !isnothing(rdf)
-            total_energy = energy_force!(positions, forces, params, pot; gofr = rdf)
-        elseif !isnothing(zfactor)
-            total_energy = energy_force!(positions, forces, params, pot; zfactor = zfactor)
+            if i % msd.interval == 0
+                @show total_energy
+                record_positions!(msd, positions, params.τ)
+            end
+        else
+
+            ermak!(positions, forces, params.τ, params.boxl, params.random_matrix)
+            if isnothing(rdf) & isnothing(zfactor)
+                total_energy = energy_force!(positions, forces, params, pot)
+            elseif !isnothing(rdf)
+                total_energy = energy_force!(positions, forces, params, pot; gofr = rdf)
+            elseif !isnothing(zfactor)
+                total_energy =
+                    energy_force!(positions, forces, params, pot; zfactor = zfactor)
+                zfactor.naverage += 1.0
+            end
         end
 
         if i % interval == 0
@@ -128,6 +146,7 @@ function move!(
         savetofile(s, grobject)
     end
 end
+
 function move!(
     N::Integer,
     s::SimulationSystem,
@@ -139,17 +158,18 @@ function move!(
     # Retrieve system information
     @unpack positions, forces = s.system
     (energies, params) = _prepare(s, N, interval)
-    _move_loop!(
-        N,
-        positions,
-        forces,
-        pot,
-        energies,
-        interval,
-        params;
-        zfactor = zfactor,
-    )
+    _move_loop!(N, positions, forces, pot, energies, interval, params; zfactor = zfactor)
     zfactor.zval = 1.0 - (zfactor.zval / (3.0 * zfactor.naverage * s.params.N))
+    if tofiles
+        savetofile(s, energies; move = true)
+    end
+end
+
+function move!(N::Integer, s::SimulationSystem, msd::MeanSquaredDisplacement)
+    # Retrieve system information
+    @unpack positions, forces = s.system
+    (energies, params) = _prepare(s, N, interval)
+    _move_loop!(N, positions, forces, pot, energies, interval, params; msd = msd)
     if tofiles
         savetofile(s, energies; move = true)
     end

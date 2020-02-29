@@ -10,4 +10,5 @@ using Test
     # TODO: algorithms/ermak.jl
     # TODO: observables/rdf.jl
     include("structuretests.jl")
+    include("thermodynamictests.jl")
 end

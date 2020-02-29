@@ -9,7 +9,13 @@ using StaticArrays
 import Plots.scatter
 
 include("types.jl")
-export SimulationSystem, Parameters, PairDistributionFunction, ZFactor, StructureFactor
+export ParticleSystem,
+    SimulationSystem,
+    Parameters,
+    PairDistributionFunction,
+    ZFactor,
+    StructureFactor,
+    MeanSquaredDisplacement
 include("potentials.jl")
 export PairwisePotential, PseudoHS, apply!
 include("observables/rdf.jl")
@@ -26,5 +32,7 @@ include("configurations.jl")
 export initialize!
 include("observables/structure.jl")
 export compute_structure!
+include("observables/msd.jl")
+export record_positions!, difusion
 
 end # module

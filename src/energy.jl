@@ -7,8 +7,8 @@ function _add_forces!(
     rp::AbstractFloat,
 )
     @inbounds for (k, c) in zip(p, f)
-        @fastmath c[idx] += (fp * k) / rp
-        @fastmath c[jdx] -= (fp * k) / rp
+        c[idx] += (fp * k) / rp
+        c[jdx] -= (fp * k) / rp
     end
 end
 
@@ -76,7 +76,7 @@ function _compute_energy!(
                     simple_rdf!(rdfobj, rij2)
                 end
                 if !isnothing(zfactor)
-                    _compressibilityz(static_positions, -f_pair, rij2, zfactor)
+                    _compressibilityz(static_positions, f_pair, rij2, zfactor)
                 end
             end
         end

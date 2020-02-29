@@ -138,15 +138,17 @@ mutable struct ZFactor{T<:AbstractFloat} <: Thermodynamics
 end
 
 abstract type Dynamics end
-mutable struct MeanSquaredDisplacement{T<:AbstractArray} <: Dynamics
+mutable struct MeanSquaredDisplacement{T<:AbstractArray,V<:Integer} <: Dynamics
     displacement::T
-    mt::Integer
+    mt::V
     timearray::T
     wt::T
+    naverage::V
+    interval::V
 end
-function MeanSquaredDisplacement(s::SimulationSystem, mt::Integer)
-    displacement = zeros(mt, s.params.N)
+function MeanSquaredDisplacement(s::SimulationSystem, mt::Integer, interval::Integer)
+    displacement = zeros(mt, s.params.N, s.dims)
     timearray = zeros(mt)
     wt = zeros(mt)
-    return MeanSquaredDisplacement(displacement, mt, timearray, wt)
+    return MeanSquaredDisplacement(displacement, mt, timearray, wt, 0, interval)
 end
