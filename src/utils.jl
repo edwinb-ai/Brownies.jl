@@ -8,7 +8,7 @@ function _create_rngs(num_rngs::Integer; seed::Integer = nothing)
         rng_master = PCG.PCGStateOneseq(seed)
     end
     # From this RNG, create `num_rngs` seeds
-    seed_list = zeros(UInt64, num_rngs)
+    seed_list = @SVector zeros(UInt64, num_rngs)
     rand!(rng_master, seed_list)
     # With these seeds, seed the new RNG's
     rng_list = map(Xorshifts.Xoroshiro128Plus, seed_list)
@@ -23,19 +23,27 @@ function rng_matrix!(rnd_matrix::AbstractArray, rng_list::AbstractArray)
     end
 end
 
-function savetofile(s::SimulationSystem, energies; move = false)
+function _save_positions(positions, forces, energies)
     # Save positions and forces
-    @unpack positions, forces = s.system
     @save "positions-$(s.params.ϕ)-$(s.params.N).jld2" positions
     @save "forces-$(s.params.ϕ)-$(s.params.N).jld2" forces
     # Save the computed energies as well
     @save "energy-$(s.params.ϕ)-$(s.params.N).jld2" energies
+end
+
+function savetofile(s::SimulationSystem, energies::AbstractArray; move = false)
+    @unpack positions, forces = s.system
+    _save_positions(positions, forces, energies)
     if move
         @save "positions-$(s.params.ϕ)-$(s.params.N)-average.jld2" positions
         @save "forces-$(s.params.ϕ)-$(s.params.N)-average.jld2" forces
         # Save the computed energies as well
         @save "energy-$(s.params.ϕ)-$(s.params.N)-average.jld2" energies
     end
+end
+
+function savetofile(s::SimulationSystem, grobject::PairDistributionFunction)
+    @save "gr-$(s.ϕ)-$(s.params.N).jld2" grobject.gofr
 end
 
 """

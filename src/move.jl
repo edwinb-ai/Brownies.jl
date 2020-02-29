@@ -89,8 +89,10 @@ function move!(
     grobject.naverage = N
     compute_rdf!(grobject, s)
     if tofiles
+        # Save positions and forces
         savetofile(s, energies; move = true)
-        @save "gr-$(s.ρ)-$(s.params.N).jld2" grobject.gofr
+        # Save pair correlation function
+        savetofile(s, grobject)
     end
 end
 
@@ -120,8 +122,10 @@ function move!(
     grobject.naverage = N
     compute_rdf!(grobject, s)
     if tofiles
+        # Save positions and forces
         savetofile(s, energies; move = true)
-        @save "gr-$(s.ϕ)-$(s.params.N).jld2" grobject.gofr
+        # Save pair correlation function
+        savetofile(s, grobject)
     end
 end
 function move!(
@@ -145,7 +149,6 @@ function move!(
         params;
         zfactor = zfactor,
     )
-    @show zfactor.zval
     zfactor.zval = 1.0 - (zfactor.zval / (3.0 * zfactor.naverage * s.params.N))
     if tofiles
         savetofile(s, energies; move = true)
