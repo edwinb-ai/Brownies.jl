@@ -136,10 +136,11 @@ mutable struct StructureFactor{T<:AbstractFloat} <: Structure
 end
 
 function StructureFactor(s::SimulationSystem, rdf::PairDistributionFunction)
+    compute_type = typeof(s.ρ)
     normalizing_constant = fourpi * s.ρ
-    sq = zeros(typeof(s.ρ), (rdf.nm, 2))
+    sq = zeros(compute_type, (rdf.nm, 2))
     dq = π / s.rc
-    return StructureFactor(sq, dq, rdf.nm, rdf.naverage, normalizing_constant)
+    return StructureFactor{compute_type}(sq, dq, rdf.nm, rdf.naverage, normalizing_constant)
 end
 
 abstract type Thermodynamics end

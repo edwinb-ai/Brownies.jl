@@ -47,7 +47,7 @@ end
     @test seed == 393216
     # Now check the system parameters
     density = 6.0 * params.ϕ / π
-    @test density == ρ
+    @test density ≈ ρ
     @test boxl == cbrt(params.N / density)
     @test rc == boxl * 0.5
     @test energy == 0.0
