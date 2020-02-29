@@ -1,3 +1,7 @@
+# Some useful constants
+const sixoverpi = 6.0 / π
+const fourpi = 4.0 * π
+
 """
     ParticleSystem{T <: AbstractVector}
 
@@ -93,7 +97,7 @@ function SimulationSystem(
     ::Type{T},
 ) where {T<:AbstractFloat}
     # Assign density for a 3D system
-    ρ = params.ϕ * 6.0 / π
+    ρ = params.ϕ * sixoverpi
     boxl = ∛(params.N / ρ)
     rc = boxl * 0.5
     # Build a system of particles with the total number of particles
@@ -111,7 +115,7 @@ mutable struct PairDistributionFunction <: Structure
 end
 
 function PairDistributionFunction(s::SimulationSystem, nm::Integer)
-    normalizing_constant = 4.0 * π * s.ρ
+    normalizing_constant = fourpi * s.ρ
     gofr = zeros(typeof(s.ρ), (nm, 2))
     dr = s.rc / nm
     return PairDistributionFunction(
@@ -123,23 +127,37 @@ function PairDistributionFunction(s::SimulationSystem, nm::Integer)
     )
 end
 
-mutable struct StructureFactor
+mutable struct StructureFactor{T<:AbstractFloat} <: Structure
     sq::AbstractArray
-    dq::AbstractFloat
+    dq::T
     nm::Integer
-    naverage::AbstractFloat
-    norm_const::AbstractFloat
+    naverage::T
+    norm_const::T
 end
 
 function StructureFactor(s::SimulationSystem, rdf::PairDistributionFunction)
-    normalizing_constant = 4.0 * π * s.ρ
+    normalizing_constant = fourpi * s.ρ
     sq = zeros(typeof(s.ρ), (rdf.nm, 2))
     dq = π / s.rc
     return StructureFactor(sq, dq, rdf.nm, rdf.naverage, normalizing_constant)
 end
 
 abstract type Thermodynamics end
-mutable struct ZFactor
-    zval::AbstractFloat
-    naverage::AbstractFloat
+mutable struct ZFactor{T<:AbstractFloat} <: Thermodynamics
+    zval::T
+    naverage::T
+end
+
+abstract type Dynamics end
+mutable struct MeanSquaredDisplacement{T<:AbstractArray} <: Dynamics
+    displacement::T
+    mt::Integer
+    timearray::T
+    wt::T
+end
+function MeanSquaredDisplacement(s::SimulationSystem, mt::Integer)
+    displacement = zeros(mt, s.params.N)
+    timearray = zeros(mt)
+    wt = zeros(mt)
+    return MeanSquaredDisplacement(displacement, mt, timearray, wt)
 end
