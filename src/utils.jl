@@ -8,12 +8,13 @@ function _create_rngs(num_rngs::Integer; seed::Integer = nothing)
         rng_master = PCG.PCGStateOneseq(seed)
     end
     # From this RNG, create `num_rngs` seeds
-    # seed_list = @SVector zeros(UInt64, num_rngs)
     seed_list = rand(rng_master, UInt64, num_rngs)
-    seed_list = SVector{num_rngs}(seed_list)
-    # rand!(rng_master, seed_list)
     # With these seeds, seed the new RNG's
     rng_list = map(Xorshifts.Xoroshiro128Plus, seed_list)
+
+    # Convert to static vector for faster performance
+    seed_list = SVector{num_rngs}(seed_list)
+    rng_list = SVector{num_rngs}(rng_list)
 
     return (seed_list, rng_list)
 end
