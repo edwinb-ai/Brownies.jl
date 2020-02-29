@@ -21,11 +21,7 @@ mutable struct ParticleSystem{T<:AbstractArray}
     forces::T
 end
 
-function ParticleSystem(
-    N::V,
-    M::V,
-    ::Type{T},
-) where {T<:AbstractFloat,V<:Integer}
+function ParticleSystem(N::V, M::V, ::Type{T}) where {T<:AbstractFloat,V<:Integer}
     pos = zeros(T, N, M)
     forces = zeros(T, N, M)
     return ParticleSystem{AbstractArray{T}}(pos, forces)
@@ -33,43 +29,45 @@ end
 
 """
 """
-mutable struct Parameters{U<:AbstractFloat,V<:Integer}
+mutable struct Parameters{U<:AbstractFloat}
     ϕ::U
     kT::U
-    N::V
+    N::Integer
     τ::U
-    seed::V
+    seed
 end
 
 # Just define packing fraction, temperature and time step
-function Parameters(ϕ, kT, τ, ::Type{U}) where {U<:AbstractFloat}
-    convert(U, ϕ)
-    convert(U, kT)
-    convert(U, τ)
-    return Parameters{U,Integer}(ϕ, kT, 512, τ, 393216)
+function Parameters(
+    ϕ::AbstractFloat,
+    kT::AbstractFloat,
+    τ::AbstractFloat,
+    ::Type{U},
+) where {U}
+    return Parameters{U}(U(ϕ), U(kT), 512, U(τ), nothing)
 end
 
 # Keep default seed, define total number of particles
 function Parameters(
-    ϕ,
-    kT,
+    ϕ::AbstractFloat,
+    kT::AbstractFloat,
     N::Integer,
-    τ,
+    τ::AbstractFloat,
     ::Type{U},
-) where {U<:AbstractFloat,V<:Integer}
-    return Parameters{U,Integer}(U(ϕ), U(kT), N, U(τ), 393216)
+) where {U}
+    return Parameters{U}(U(ϕ), U(kT), N, U(τ), nothing)
 end
 
 # Define a different seed
 function Parameters(
-    ϕ,
-    kT,
+    ϕ::AbstractFloat,
+    kT::AbstractFloat,
     N::Integer,
-    τ,
+    τ::AbstractFloat,
     s::Integer,
     ::Type{U},
-) where {U<:AbstractFloat,V<:Integer}
-    return Parameters{U,Integer}(U(ϕ), U(kT), N, U(τ), s)
+) where {U}
+    return Parameters{U}(U(ϕ), U(kT), N, U(τ), s)
 end
 
 """
@@ -118,13 +116,7 @@ function PairDistributionFunction(s::SimulationSystem, nm::Integer)
     normalizing_constant = fourpi * s.ρ
     gofr = zeros(typeof(s.ρ), (nm, 2))
     dr = s.rc / nm
-    return PairDistributionFunction(
-        gofr,
-        nm,
-        dr,
-        0.0,
-        normalizing_constant,
-    )
+    return PairDistributionFunction(gofr, nm, dr, 0.0, normalizing_constant)
 end
 
 mutable struct StructureFactor{T<:AbstractFloat} <: Structure

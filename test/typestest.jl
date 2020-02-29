@@ -8,7 +8,7 @@ using UnPack
     @test kT == 1.4737f0
     @test N == 512
     @test τ == 0.00001f0
-    @test seed == 393216
+    @test seed == nothing
 
     # Second constructor, define number of particles
     num_particles = 256
@@ -18,12 +18,12 @@ using UnPack
     @test kT == 1.4737f0
     @test N == num_particles
     @test τ == 0.00001f0
-    @test seed == 393216
+    @test seed == nothing
 
     # Third constructor, define number of particles and random seed
     num_particles = 256
     new_seed = 804533
-    p2 = Parameters(0.4, 1.4737, num_particles, 1e-5, new_seed, Float32)
+    p2 = Parameters{Float32}(0.4, 1.4737, num_particles, 1e-5, new_seed)
     @unpack ϕ, kT, N, τ, seed = p2
     @test ϕ == 0.4f0
     @test kT == 1.4737f0
@@ -44,7 +44,7 @@ end
     @test kT == 1.4737
     @test N == 512
     @test τ == 0.00001
-    @test seed == 393216
+    @test seed == nothing
     # Now check the system parameters
     density = 6.0 * params.ϕ / π
     @test density ≈ ρ

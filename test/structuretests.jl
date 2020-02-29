@@ -1,7 +1,7 @@
 using Statistics
 
 @testset "StructureFactor" begin
-    p = Parameters(0.4, 1.4737, 7^3, 1e-5, Float64)
+    p = Parameters(0.4, 1.4737, 7^3, 1e-5, 393216, Float64)
     s = SimulationSystem(p, 3, Float64)
     potential = PseudoHS(50.0, p.kT)
     initialize!(s)
