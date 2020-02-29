@@ -89,11 +89,7 @@ mutable struct SimulationSystem{U<:AbstractFloat}
     dims::Integer
 end
 
-function SimulationSystem(
-    params::Parameters,
-    dims::Integer,
-    ::Type{T},
-) where {T<:AbstractFloat}
+function SimulationSystem(params::Parameters, dims::Integer, ::Type{T}) where {T}
     # Assign density for a 3D system
     ρ = params.ϕ * sixoverpi
     boxl = ∛(params.N / ρ)
