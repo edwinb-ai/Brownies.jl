@@ -26,7 +26,6 @@ function _move_loop!(
             )
             total_energy = energy_force!(positions, forces, params, pot)
             if i % msd.interval == 0
-                @show total_energy
                 record_positions!(msd, positions, params.τ)
             end
         else
@@ -36,10 +35,11 @@ function _move_loop!(
                 total_energy = energy_force!(positions, forces, params, pot)
             elseif !isnothing(rdf)
                 total_energy = energy_force!(positions, forces, params, pot; gofr = rdf)
+                rdf.naverage += 1
             elseif !isnothing(zfactor)
                 total_energy =
                     energy_force!(positions, forces, params, pot; zfactor = zfactor)
-                zfactor.naverage += 1.0
+                zfactor.naverage += 1
             end
         end
 
@@ -165,12 +165,20 @@ function move!(
     end
 end
 
-function move!(N::Integer, s::SimulationSystem, msd::MeanSquaredDisplacement)
+function move!(
+    N::Integer,
+    s::SimulationSystem,
+    pot::PairwisePotential,
+    msd::MeanSquaredDisplacement;
+    interval = 1000,
+    tofiles = false,
+)
     # Retrieve system information
     @unpack positions, forces = s.system
     (energies, params) = _prepare(s, N, interval)
     _move_loop!(N, positions, forces, pot, energies, interval, params; msd = msd)
+    difusion!(msd)
     if tofiles
-        savetofile(s, energies; move = true)
+        savetofile(s, energies, msd; move = true)
     end
 end

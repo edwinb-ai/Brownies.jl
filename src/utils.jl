@@ -46,7 +46,15 @@ function savetofile(s::SimulationSystem, energies::AbstractArray; move = false)
 end
 
 function savetofile(s::SimulationSystem, grobject::PairDistributionFunction)
+    @unpack positions, forces = s.system
+    _save_positions(positions, forces, energies, s.params.ϕ, s.params.N)
     @save "gr-$(s.ϕ)-$(s.params.N).jld2" grobject.gofr
+end
+
+function savetofile(s::SimulationSystem, msd::MeanSquaredDisplacement)
+    @unpack positions, forces = s.system
+    _save_positions(positions, forces, energies, s.params.ϕ, s.params.N)
+    @save "msd-$(s.ϕ)-$(s.params.N).jld2" msd.wt
 end
 
 """

@@ -33,6 +33,6 @@ export initialize!
 include("observables/structure.jl")
 export compute_structure!
 include("observables/msd.jl")
-export record_positions!, difusion
+export record_positions!, difusion!
 
 end # module
