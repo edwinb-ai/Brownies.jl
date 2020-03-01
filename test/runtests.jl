@@ -11,4 +11,5 @@ using Test
     # TODO: observables/rdf.jl
     include("structuretests.jl")
     include("thermodynamictests.jl")
+    include("dynamicstests.jl")
 end
