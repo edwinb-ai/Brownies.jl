@@ -1,11 +1,11 @@
 function _create_rngs(num_rngs::Integer; seed::Integer = nothing)
     # Create the RNG to create seeds
-    if isnothing(seed)
+    if seed == 0
         # Without a given seed
-        rng_master = PCG.PCGStateOneseq()
+        rng_master = PCG.PCGStateUnique()
     else
         # With a given seed
-        rng_master = PCG.PCGStateOneseq(seed)
+        rng_master = PCG.PCGStateUnique(seed)
     end
     # From this RNG, create `num_rngs` seeds
     seed_list = rand(rng_master, UInt64, num_rngs)
@@ -26,35 +26,35 @@ function rng_matrix!(rnd_matrix::AbstractArray, rng_list::AbstractArray)
     end
 end
 
-function _save_positions(positions, forces, energies, ϕ, N)
+function _save_positions(positions, forces, energies, ϕ, N, seed)
     # Save positions and forces
-    @save "positions-$(ϕ)-$(N).jld2" positions
-    @save "forces-$(ϕ)-$(N).jld2" forces
+    @save "positions-$(ϕ)-$(N)-$(seed).jld2" positions
+    @save "forces-$(ϕ)-$(N)-$(seed).jld2" forces
     # Save the computed energies as well
-    @save "energy-$(ϕ)-$(N).jld2" energies
+    @save "energy-$(ϕ)-$(N)-$(seed).jld2" energies
 end
 
 function savetofile(s::SimulationSystem, energies::AbstractArray; move = false)
     @unpack positions, forces = s.system
-    _save_positions(positions, forces, energies, s.params.ϕ, s.params.N)
+    _save_positions(positions, forces, energies, s.params.ϕ, s.params.N, s.params.seed)
     if move
-        @save "positions-$(s.params.ϕ)-$(s.params.N)-average.jld2" positions
-        @save "forces-$(s.params.ϕ)-$(s.params.N)-average.jld2" forces
+        @save "positions-$(s.params.ϕ)-$(s.params.N)-$(s.params.seed)-average.jld2" positions
+        @save "forces-$(s.params.ϕ)-$(s.params.N)-$(s.params.seed)-average.jld2" forces
         # Save the computed energies as well
-        @save "energy-$(s.params.ϕ)-$(s.params.N)-average.jld2" energies
+        @save "energy-$(s.params.ϕ)-$(s.params.N)-$(s.params.seed)-average.jld2" energies
     end
 end
 
 function savetofile(s::SimulationSystem, grobject::PairDistributionFunction)
     @unpack positions, forces = s.system
-    _save_positions(positions, forces, energies, s.params.ϕ, s.params.N)
-    @save "gr-$(s.ϕ)-$(s.params.N).jld2" grobject.gofr
+    _save_positions(positions, forces, energies, s.params.ϕ, s.params.N, s.params.seed)
+    @save "gr-$(s.params.ϕ)-$(s.params.N)-$(s.params.seed).jld2" grobject.gofr
 end
 
 function savetofile(s::SimulationSystem, msd::MeanSquaredDisplacement)
     @unpack positions, forces = s.system
-    _save_positions(positions, forces, energies, s.params.ϕ, s.params.N)
-    @save "msd-$(s.ϕ)-$(s.params.N).jld2" msd.wt
+    # _save_positions(positions, forces, energies, s.params.ϕ, s.params.N, s.params.seed)
+    @save "msd-$(s.params.ϕ)-$(s.params.N)-$(s.params.seed).jld2" msd.wt
 end
 
 """

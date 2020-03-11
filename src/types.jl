@@ -44,7 +44,7 @@ function Parameters(
     τ::AbstractFloat,
     ::Type{U},
 ) where {U}
-    return Parameters{U}(U(ϕ), U(kT), 512, U(τ), nothing)
+    return Parameters{U}(U(ϕ), U(kT), 512, U(τ), 0)
 end
 
 # Keep default seed, define total number of particles
@@ -55,7 +55,7 @@ function Parameters(
     τ::AbstractFloat,
     ::Type{U},
 ) where {U}
-    return Parameters{U}(U(ϕ), U(kT), N, U(τ), nothing)
+    return Parameters{U}(U(ϕ), U(kT), N, U(τ), 0)
 end
 
 # Define a different seed

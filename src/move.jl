@@ -179,6 +179,9 @@ function move!(
     _move_loop!(N, positions, forces, pot, energies, interval, params; msd = msd)
     difusion!(msd)
     if tofiles
-        savetofile(s, energies, msd; move = true)
+        # Save positions and forces
+        savetofile(s, energies; move = true)
+        # Then save the observable
+        savetofile(s, msd)
     end
 end
