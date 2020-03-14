@@ -6,10 +6,11 @@
     move!(1000, s, potential; interval = 500)
     zfac = ZFactor(0.0, 0.0)
     move!(1000, s, potential, zfac; interval = 500)
-    @show zfac.zval
 
     # Check consistency
     @test zfac.naverage == 1000.0
-    # Check value, NOT physically representative
-    @test zfac.zval ≈ 8.24498784197415
+    # Compute the Carnahan-Starling value
+    true_zcomp = 8.24498784197415
+    # Check value, larger means that it needs more steps (which is the case)
+    @test zfac.zval == true_zcomp
 end

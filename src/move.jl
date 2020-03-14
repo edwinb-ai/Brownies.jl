@@ -30,15 +30,27 @@ function _move_loop!(
             end
         else
 
-            ermak!(positions, forces, params.τ, params.boxl, params.random_matrix)
+            ermak!(
+                positions,
+                forces,
+                params.τ,
+                params.boxl,
+                params.random_matrix,
+            )
             if isnothing(rdf) & isnothing(zfactor)
                 total_energy = energy_force!(positions, forces, params, pot)
             elseif !isnothing(rdf)
-                total_energy = energy_force!(positions, forces, params, pot; gofr = rdf)
+                total_energy =
+                    energy_force!(positions, forces, params, pot; gofr = rdf)
                 rdf.naverage += 1
             elseif !isnothing(zfactor)
-                total_energy =
-                    energy_force!(positions, forces, params, pot; zfactor = zfactor)
+                total_energy = energy_force!(
+                    positions,
+                    forces,
+                    params,
+                    pot;
+                    zfactor = zfactor,
+                )
                 zfactor.naverage += 1
             end
         end
@@ -50,6 +62,8 @@ function _move_loop!(
         end
     end
     total_energy = energy_force!(positions, forces, params, pot)
+
+    return total_energy
 end
 
 function _prepare(s::SimulationSystem, N::Integer, interval::Integer)
@@ -86,9 +100,11 @@ function move!(
     # Retrieve system information
     @unpack positions, forces = s.system
     (energies, params) = _prepare(s, N, interval)
-    _move_loop!(N, positions, forces, pot, energies, interval, params)
+    total_energy =
+        _move_loop!(N, positions, forces, pot, energies, interval, params)
+    s.energy = total_energy
     if tofiles
-        savetofile(s, energies)
+        savetofile(s)
     end
 end
 
@@ -103,14 +119,21 @@ function move!(
     # Retrieve system information
     @unpack positions, forces = s.system
     (energies, params) = _prepare(s, N, interval)
-    _move_loop!(N, positions, forces, pot, energies, interval, params; rdf = grobject)
+    total_energy = _move_loop!(
+        N,
+        positions,
+        forces,
+        pot,
+        energies,
+        interval,
+        params;
+        rdf = grobject,
+    )
+    s.energy = total_energy
     grobject.naverage = N
     compute_rdf!(grobject, s)
     if tofiles
-        # Save positions and forces
-        savetofile(s, energies; move = true)
-        # Save pair correlation function
-        savetofile(s, grobject)
+        savetofile(s, grobject; move = true)
     end
 end
 
@@ -126,7 +149,7 @@ function move!(
     # Retrieve system information
     @unpack positions, forces = s.system
     (energies, params) = _prepare(s, N, interval)
-    _move_loop!(
+    total_energy = _move_loop!(
         N,
         positions,
         forces,
@@ -139,11 +162,9 @@ function move!(
     )
     grobject.naverage = N
     compute_rdf!(grobject, s)
+    s.energy = total_energy
     if tofiles
-        # Save positions and forces
-        savetofile(s, energies; move = true)
-        # Save pair correlation function
-        savetofile(s, grobject)
+        savetofile(s, grobject; move = true)
     end
 end
 
@@ -158,10 +179,20 @@ function move!(
     # Retrieve system information
     @unpack positions, forces = s.system
     (energies, params) = _prepare(s, N, interval)
-    _move_loop!(N, positions, forces, pot, energies, interval, params; zfactor = zfactor)
+    total_energy = _move_loop!(
+        N,
+        positions,
+        forces,
+        pot,
+        energies,
+        interval,
+        params;
+        zfactor = zfactor,
+    )
     zfactor.zval = 1.0 - (zfactor.zval / (3.0 * zfactor.naverage * s.params.N))
+    s.energy = total_energy
     if tofiles
-        savetofile(s, energies; move = true)
+        savetofile(s; move = true)
     end
 end
 
@@ -176,12 +207,18 @@ function move!(
     # Retrieve system information
     @unpack positions, forces = s.system
     (energies, params) = _prepare(s, N, interval)
-    _move_loop!(N, positions, forces, pot, energies, interval, params; msd = msd)
+    _move_loop!(
+        N,
+        positions,
+        forces,
+        pot,
+        energies,
+        interval,
+        params;
+        msd = msd,
+    )
     difusion!(msd)
     if tofiles
-        # Save positions and forces
-        savetofile(s, energies; move = true)
-        # Then save the observable
-        savetofile(s, msd)
+        savetofile(s, msd; move = true)
     end
 end

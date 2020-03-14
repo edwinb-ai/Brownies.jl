@@ -8,7 +8,7 @@ using UnPack
     @test kT == 1.4737f0
     @test N == 512
     @test τ == 0.00001f0
-    @test seed == nothing
+    @test seed == 0
 
     # Second constructor, define number of particles
     num_particles = 256
@@ -18,7 +18,7 @@ using UnPack
     @test kT == 1.4737f0
     @test N == num_particles
     @test τ == 0.00001f0
-    @test seed == nothing
+    @test seed == 0
 
     # Third constructor, define number of particles and random seed
     num_particles = 256
@@ -44,7 +44,7 @@ end
     @test kT == 1.4737
     @test N == 512
     @test τ == 0.00001
-    @test seed == nothing
+    @test seed == 0
     # Now check the system parameters
     density = 6.0 * params.ϕ / π
     @test density ≈ ρ

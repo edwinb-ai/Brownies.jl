@@ -45,6 +45,3 @@ function initialize!(sys::SimulationSystem)
     distance_half = oftype(sys.ρ, distance * 0.5)
     _lattice_configuration!(x, y, z, distance, distance_half, sys.rc, sys.params.N)
 end
-
-# TODO: Write an initialization with a given file for a
-# given configuration

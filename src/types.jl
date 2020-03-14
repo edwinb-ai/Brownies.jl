@@ -34,7 +34,7 @@ mutable struct Parameters{U<:AbstractFloat}
     kT::U
     N::Integer
     τ::U
-    seed
+    seed::Integer
 end
 
 # Just define packing fraction, temperature and time step

@@ -6,6 +6,8 @@ using Random
 using RandomNumbers.PCG
 using RandomNumbers.Xorshifts
 using StaticArrays
+using DataFrames
+using CSV
 import Plots.scatter
 
 include("types.jl")

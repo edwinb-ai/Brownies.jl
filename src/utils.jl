@@ -1,11 +1,12 @@
-function _create_rngs(num_rngs::Integer; seed::Integer = nothing)
+function _create_rngs(num_rngs::Integer; seed::Integer = 0)
     # Create the RNG to create seeds
     if seed == 0
         # Without a given seed
-        rng_master = PCG.PCGStateUnique()
+        @show "I'm here!"
+        rng_master = PCG.PCGStateOneseq()
     else
         # With a given seed
-        rng_master = PCG.PCGStateUnique(seed)
+        rng_master = PCG.PCGStateOneseq(seed)
     end
     # From this RNG, create `num_rngs` seeds
     seed_list = rand(rng_master, UInt64, num_rngs)
@@ -26,35 +27,91 @@ function rng_matrix!(rnd_matrix::AbstractArray, rng_list::AbstractArray)
     end
 end
 
-function _save_positions(positions, forces, energies, ϕ, N, seed)
-    # Save positions and forces
-    @save "positions-$(ϕ)-$(N)-$(seed).jld2" positions
-    @save "forces-$(ϕ)-$(N)-$(seed).jld2" forces
-    # Save the computed energies as well
-    @save "energy-$(ϕ)-$(N)-$(seed).jld2" energies
-end
+function _save_positions(positions, forces, ϕ, N, seed; move = false)
+    move_string = "-average.csv"
+    filename = ".csv"
 
-function savetofile(s::SimulationSystem, energies::AbstractArray; move = false)
-    @unpack positions, forces = s.system
-    _save_positions(positions, forces, energies, s.params.ϕ, s.params.N, s.params.seed)
+    # Save positions
+    pos_df = DataFrame()
+    pos_df.x = positions[:, 1]
+    pos_df.y = positions[:, 2]
+    pos_df.z = positions[:, 3]
+    positions_name = "positions-$ϕ-$N-$seed"
+
+    # Save forces
+    forces_df = DataFrame()
+    forces_df.x = forces[:, 1]
+    forces_df.y = forces[:, 2]
+    forces_df.z = forces[:, 3]
+    forces_name = "forces-$ϕ-$N-$seed"
+
     if move
-        @save "positions-$(s.params.ϕ)-$(s.params.N)-$(s.params.seed)-average.jld2" positions
-        @save "forces-$(s.params.ϕ)-$(s.params.N)-$(s.params.seed)-average.jld2" forces
-        # Save the computed energies as well
-        @save "energy-$(s.params.ϕ)-$(s.params.N)-$(s.params.seed)-average.jld2" energies
+        positions_name *= move_string
+        forces_name *= move_string
+    else
+        positions_name *= filename
+        forces_name *= filename
     end
+
+    # Save to files
+    CSV.write(positions_name, pos_df)
+    CSV.write(forces_name, forces_df)
 end
 
-function savetofile(s::SimulationSystem, grobject::PairDistributionFunction)
+function savetofile(s::SimulationSystem; move = false)
     @unpack positions, forces = s.system
-    _save_positions(positions, forces, energies, s.params.ϕ, s.params.N, s.params.seed)
-    @save "gr-$(s.params.ϕ)-$(s.params.N)-$(s.params.seed).jld2" grobject.gofr
+    _save_positions(
+        positions,
+        forces,
+        s.params.ϕ,
+        s.params.N,
+        s.params.seed;
+        move = move,
+    )
 end
 
-function savetofile(s::SimulationSystem, msd::MeanSquaredDisplacement)
+function savetofile(
+    s::SimulationSystem,
+    grobject::PairDistributionFunction;
+    move = false,
+)
     @unpack positions, forces = s.system
-    # _save_positions(positions, forces, energies, s.params.ϕ, s.params.N, s.params.seed)
-    @save "msd-$(s.params.ϕ)-$(s.params.N)-$(s.params.seed).jld2" msd.wt
+    _save_positions(
+        positions,
+        forces,
+        s.params.ϕ,
+        s.params.N,
+        s.params.seed;
+        move = move,
+    )
+
+    gofr_df = DataFrame()
+    gofr_df.r = grobject.gofr[:, 1]
+    gofr_df.gr = grobject.gofr[:, 2]
+    gr_filename = "gr-$(s.params.ϕ)-$(s.params.N)-$(s.params.seed).csv"
+    CSV.write(gr_filename, gofr_df)
+end
+
+function savetofile(
+    s::SimulationSystem,
+    msd::MeanSquaredDisplacement;
+    move = false,
+)
+    @unpack positions, forces = s.system
+    _save_positions(
+        positions,
+        forces,
+        s.params.ϕ,
+        s.params.N,
+        s.params.seed;
+        move = false,
+    )
+
+    msd_df = DataFrame()
+    msd_df.t = msd.wt[:, 1]
+    msd_df.xt = msd.wt[:, 2]
+    msd_filename = "msd-$(s.params.ϕ)-$(s.params.N)-$(s.params.seed).csv"
+    CSV.write(msd_filename, msd_df)
 end
 
 """
