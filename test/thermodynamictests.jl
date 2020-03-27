@@ -12,5 +12,5 @@
     # Compute the Carnahan-Starling value
     true_zcomp = 8.24498784197415
     # Check value, larger means that it needs more steps (which is the case)
-    @test zfac.zval == true_zcomp
+    @test zfac.zval ≈ true_zcomp
 end
