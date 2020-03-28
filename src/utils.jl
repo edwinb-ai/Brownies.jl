@@ -2,7 +2,6 @@ function _create_rngs(num_rngs::Integer; seed::Integer = 0)
     # Create the RNG to create seeds
     if seed == 0
         # Without a given seed
-        @show "I'm here!"
         rng_master = PCG.PCGStateOneseq()
     else
         # With a given seed

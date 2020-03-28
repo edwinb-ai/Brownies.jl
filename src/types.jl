@@ -127,7 +127,7 @@ function StructureFactor(s::SimulationSystem, rdf::PairDistributionFunction)
     compute_type = typeof(s.ρ)
     normalizing_constant = fourpi * s.ρ
     sq = zeros(compute_type, (rdf.nm, 2))
-    dq = π / s.rc
+    dq = 0.1 * π / s.rc
     return StructureFactor{compute_type}(sq, dq, rdf.nm, rdf.naverage, normalizing_constant)
 end
 

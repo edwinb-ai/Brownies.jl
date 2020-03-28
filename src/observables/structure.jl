@@ -11,10 +11,9 @@ function _fourier_structure!(
     end
 
     for i = 2:sqobj.nm
-        sum_total = sum(
-            rdfpos .^ 2 .* gofr .* sin.(sqobj.sq[i, 1] * rdfpos) ./
-                (sqobj.sq[i, 1] * rdfpos),
-        )
+        integrand =
+            @. rdfpos^2 * gofr * sin(sqobj.sq[i, 1] * rdfpos) / (sqobj.sq[i, 1] * rdfpos)
+        sum_total = sum(integrand)
         sum_total *= sqobj.norm_const * dr
         sqobj.sq[i, 2] = 1.0 + sum_total
     end
