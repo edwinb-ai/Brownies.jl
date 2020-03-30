@@ -14,6 +14,7 @@ export ParticleSystem,
     Parameters,
     PairDistributionFunction,
     ZFactor,
+    compute_z,
     StructureFactor,
     MeanSquaredDisplacement
 include("potentials.jl")

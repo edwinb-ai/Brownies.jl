@@ -137,6 +137,10 @@ mutable struct ZFactor{T<:AbstractFloat} <: Thermodynamics
     naverage::T
 end
 
+function compute_z(zfac::ZFactor, N::Real)
+    return 1.0 - (zfac.zval / (3.0 * zfac.naverage * N))
+end
+
 abstract type Dynamics end
 mutable struct MeanSquaredDisplacement{V<:Integer} <: Dynamics
     displacement::AbstractArray

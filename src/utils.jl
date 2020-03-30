@@ -112,14 +112,3 @@ function savetofile(
     msd_filename = "msd-$(s.params.ϕ)-$(s.params.N)-$(s.params.seed).csv"
     CSV.write(msd_filename, msd_df)
 end
-
-"""
-    Extend the scatter method from Plots to enable inspection
-of the system.
-"""
-function scatter(s::SimulationSystem)
-    x = view(s.system.positions, :, 1)
-    y = view(s.system.positions, :, 2)
-    z = view(s.system.positions, :, 3)
-    scatter(x, y, z)
-end
