@@ -5,8 +5,6 @@ using Random
 using RandomNumbers.PCG
 using RandomNumbers.Xorshifts
 using StaticArrays
-using DataFrames
-using CSV
 
 include("types.jl")
 export ParticleSystem,
