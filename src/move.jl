@@ -217,3 +217,25 @@ function move!(
     # Compute and normalize the MeanSquaredDisplacement with all the recorded positions
     difusion!(msd)
 end
+
+function move!(
+    N::Integer,
+    s::SimulationSystem,
+    pot::PairwisePotential,
+    msd::MeanSquaredDisplacement,
+    sft::SelfScatteringFunction;
+    interval = 1000,
+)
+    # Retrieve system information
+    @unpack positions, forces = s.system
+    (energies, params) = _prepare(s, N, interval)
+    _move_loop!(N, positions, forces, pot, energies, interval, params; msd = msd)
+
+    # Copy the displacement vector from the MeanSquaredDisplacement to the
+    # SelfScatteringFunction
+    sft.dft[:, 1] = copy(msd.wt[:, 1])
+
+    # Compute and normalize the MeanSquaredDisplacement and the SelfScatteringFunction
+    # with all the recorded positions
+    difusion!(msd; sft = sft)
+end

@@ -14,7 +14,8 @@ export ParticleSystem,
     ZFactor,
     compute_z,
     StructureFactor,
-    MeanSquaredDisplacement
+    MeanSquaredDisplacement,
+    SelfScatteringFunction
 include("potentials.jl")
 export PairwisePotential, PseudoHS, apply!
 include("observables/rdf.jl")
