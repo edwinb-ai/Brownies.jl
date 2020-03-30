@@ -1,14 +1,10 @@
 module Brownies
 
-using JLD2
 using UnPack
 using Random
 using RandomNumbers.PCG
 using RandomNumbers.Xorshifts
 using StaticArrays
-using DataFrames
-using CSV
-import Plots.scatter
 
 include("types.jl")
 export ParticleSystem,
@@ -16,6 +12,7 @@ export ParticleSystem,
     Parameters,
     PairDistributionFunction,
     ZFactor,
+    compute_z,
     StructureFactor,
     MeanSquaredDisplacement
 include("potentials.jl")
@@ -25,7 +22,7 @@ export compute_rdf!, simple_rdf!
 include("energy.jl")
 export energy_force!
 include("utils.jl")
-export rng_matrix!, savetofile
+export rng_matrix!
 include("move.jl")
 export move!, thermalize!
 include("algorithms/ermak.jl")
