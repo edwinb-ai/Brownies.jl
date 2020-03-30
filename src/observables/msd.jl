@@ -16,7 +16,7 @@ function difusion!(msd::MeanSquaredDisplacement)
     num_particle = size(msd.displacement, 2)
     norm_val = 0.0
 
-    for i = 1:(msd.naverage-1)
+    for i = 1:msd.naverage
         total_sum = 0.0
         @inbounds @fastmath for j = 1:(msd.naverage-i)
             ddiff = msd.displacement[j+i, :, :] - msd.displacement[j, :, :]

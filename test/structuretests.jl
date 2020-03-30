@@ -12,9 +12,11 @@ using Statistics
     compute_structure!(sqfactor, gfunc, s)
 
     # Should be "almost" 1
-    @test isapprox(mean(sqfactor.sq[:, 2]), 1.0; atol=1e-1)
+    sq_values = @view sqfactor.sq[:, 2]
+    half_idx = fld1(length(sq_values), 2)
+    @test isapprox(mean(sq_values[half_idx:end]), 1.0; atol=1e-1)
     # Check spacing
-    dq = π / s.rc
+    dq = 0.1 * π / s.rc
     @test sqfactor.sq[2, 1] == dq
     # Check the normalizing constant
     const_val = 4.0 * π * s.ρ
