@@ -24,7 +24,7 @@ export compute_rdf!, simple_rdf!
 include("energy.jl")
 export energy_force!
 include("utils.jl")
-export rng_matrix!, savetofile
+export rng_matrix!
 include("move.jl")
 export move!, thermalize!
 include("algorithms/ermak.jl")

@@ -32,49 +32,32 @@ function _move_loop!(
                 record_positions!(msd, positions, params.τ)
             end
         else
-        # If it happens that we don't need the MeanSquaredDisplacement, then we proceed
-        # moving the particles around
-            ermak!(
-                positions,
-                forces,
-                params.τ,
-                params.boxl,
-                params.random_matrix,
-            )
+            # If it happens that we don't need the MeanSquaredDisplacement, then we proceed
+            # moving the particles around
+            ermak!(positions, forces, params.τ, params.boxl, params.random_matrix)
 
             # We check to see if we need to compute physical observables, if not
             # we just move particles around and check their energy
             if isnothing(rdf) && isnothing(zfactor)
                 total_energy = energy_force!(positions, forces, params, pot)
 
-            # We now check to see if the PairDistributionFunction is needed, if so
-            # we step in and compute it
+                # We now check to see if the PairDistributionFunction is needed, if so
+                # we step in and compute it
             elseif !isnothing(rdf)
-                total_energy =
-                    energy_force!(positions, forces, params, pot; gofr = rdf)
+                total_energy = energy_force!(positions, forces, params, pot; gofr = rdf)
                 rdf.naverage += 1
                 # If it so happens that the CompressibilityFactor needs to be computed
                 # as well, we check to see if the object is passed and compute it
                 if !isnothing(zfactor)
-                    total_energy = energy_force!(
-                        positions,
-                        forces,
-                        params,
-                        pot;
-                        zfactor = zfactor,
-                    )
+                    total_energy =
+                        energy_force!(positions, forces, params, pot; zfactor = zfactor)
                     zfactor.naverage += 1
                 end
 
-            # If nothing but the CompressibilityFactor is needed, we compute it here
+                # If nothing but the CompressibilityFactor is needed, we compute it here
             elseif !isnothing(zfactor)
-                total_energy = energy_force!(
-                    positions,
-                    forces,
-                    params,
-                    pot;
-                    zfactor = zfactor,
-                )
+                total_energy =
+                    energy_force!(positions, forces, params, pot; zfactor = zfactor)
                 zfactor.naverage += 1
             end
         end
@@ -120,13 +103,7 @@ function _prepare(s::SimulationSystem, N::Integer, interval::Integer)
     return energies, params
 end
 
-function move!(
-    N::Integer,
-    s::SimulationSystem,
-    pot::PairwisePotential;
-    interval = 1000,
-    tofiles = false,
-)
+function move!(N::Integer, s::SimulationSystem, pot::PairwisePotential; interval = 1000)
     # Retrieve system information
     @unpack positions, forces = s.system
 
@@ -134,15 +111,9 @@ function move!(
     (energies, params) = _prepare(s, N, interval)
 
     # And then we move all the particles
-    total_energy =
-        _move_loop!(N, positions, forces, pot, energies, interval, params)
+    total_energy = _move_loop!(N, positions, forces, pot, energies, interval, params)
     # Lastly, we assign the system's energy
     s.energy = total_energy
-
-    # Save to a file if requested
-    if tofiles
-        savetofile(s)
-    end
 end
 
 function move!(
@@ -151,34 +122,20 @@ function move!(
     pot::PairwisePotential,
     grobject::PairDistributionFunction;
     interval = 1000,
-    tofiles = false,
 )
     # Retrieve system information
     @unpack positions, forces = s.system
     (energies, params) = _prepare(s, N, interval)
 
     # Pass in the PairDistributionFunction object and move particles
-    total_energy = _move_loop!(
-        N,
-        positions,
-        forces,
-        pot,
-        energies,
-        interval,
-        params;
-        rdf = grobject,
-    )
+    total_energy =
+        _move_loop!(N, positions, forces, pot, energies, interval, params; rdf = grobject)
     s.energy = total_energy
 
     # After all the statistics have been collected, we normalize the
     # PairDistributionFunction object
     grobject.naverage = N
     compute_rdf!(grobject, s)
-
-    # Save to a file if requested
-    if tofiles
-        savetofile(s, grobject; move = true)
-    end
 end
 
 function move!(
@@ -188,7 +145,6 @@ function move!(
     grobject::PairDistributionFunction,
     zfactor::ZFactor;
     interval = 1000,
-    tofiles = false,
 )
     # Retrieve system information
     @unpack positions, forces = s.system
@@ -217,11 +173,6 @@ function move!(
 
     # Assign the full system's energy
     s.energy = total_energy
-
-    # Save to a file if requested
-    if tofiles
-        savetofile(s, grobject; move = true)
-    end
 end
 
 function move!(
@@ -230,7 +181,6 @@ function move!(
     pot::PairwisePotential,
     zfactor::ZFactor;
     interval = 1000,
-    tofiles = false,
 )
     # Retrieve system information
     @unpack positions, forces = s.system
@@ -250,11 +200,6 @@ function move!(
 
     # Assign the full system's energy
     s.energy = total_energy
-
-    # Save to a file if requested
-    if tofiles
-        savetofile(s; move = true)
-    end
 end
 
 function move!(
@@ -263,27 +208,12 @@ function move!(
     pot::PairwisePotential,
     msd::MeanSquaredDisplacement;
     interval = 1000,
-    tofiles = false,
 )
     # Retrieve system information
     @unpack positions, forces = s.system
     (energies, params) = _prepare(s, N, interval)
-    _move_loop!(
-        N,
-        positions,
-        forces,
-        pot,
-        energies,
-        interval,
-        params;
-        msd = msd,
-    )
+    _move_loop!(N, positions, forces, pot, energies, interval, params; msd = msd)
 
     # Compute and normalize the MeanSquaredDisplacement with all the recorded positions
     difusion!(msd)
-
-    # Save to a file if requested
-    if tofiles
-        savetofile(s, msd; move = true)
-    end
 end

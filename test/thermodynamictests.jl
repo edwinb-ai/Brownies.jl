@@ -21,7 +21,7 @@ end
     potential = PseudoHS(50.0, p.kT)
     initialize!(s)
     move!(1000, s, potential; interval = 500)
-    
+
     gfunc = PairDistributionFunction(s, 2^9)
     zfac = ZFactor(0.0, 0.0)
     move!(1000, s, potential, gfunc, zfac; interval = 500)
