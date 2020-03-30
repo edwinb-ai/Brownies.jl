@@ -6,4 +6,5 @@ using Test
     include("structuretests.jl")
     include("thermodynamictests.jl")
     include("dynamicstests.jl")
+    include("utilstests.jl")
 end
