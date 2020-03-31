@@ -5,6 +5,8 @@ using Random
 using RandomNumbers.PCG
 using RandomNumbers.Xorshifts
 using StaticArrays
+using DataFrames
+using LinearAlgebra: norm
 
 include("types.jl")
 export ParticleSystem,
@@ -23,7 +25,7 @@ export compute_rdf!, simple_rdf!
 include("energy.jl")
 export energy_force!
 include("utils.jl")
-export rng_matrix!
+export rng_matrix!, todataframe
 include("move.jl")
 export move!, thermalize!
 include("algorithms/ermak.jl")

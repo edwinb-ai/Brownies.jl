@@ -11,41 +11,48 @@ function record_positions!(
     end
 end
 
-function difusion!(msd::MeanSquaredDisplacement; sft::SelfScatteringFunction = nothing)
-    total_sum = 0.0
+function difusion!(msd::MeanSquaredDisplacement)
     num_particle = size(msd.displacement, 2)
-    norm_val = 0.0
-    total_scattering = 0.0
 
     for i = 1:msd.naverage
-        total_sum = 0.0
-        @inbounds @fastmath for j = 1:(msd.naverage-i)
-            ddiff = msd.displacement[j+i, :, :] - msd.displacement[j, :, :]
-            ddiff = @. ddiff^2
-            total_sum += sum(ddiff)
+        total_msd = 0.0
 
-            # Is needed, compute the scattering values for an isotropic system
-            if !isnothing(sft)
-                total_scattering += _scattering(ddiff, sft.κ)
-            end
+        @inbounds for j = 1:(msd.naverage-i)
+            ddiff = msd.displacement[j+i, :, :] - msd.displacement[j, :, :]
+            ddiff = sum(ddiff.^2)
+            total_msd += ddiff
         end
 
         # Normalize the MeanSquaredDisplacement
         norm_val = num_particle * (msd.naverage - i)
-        total_sum /= norm_val
-        msd.wt[i, 2] = total_sum
-
-        # Normalize the SelfScatteringFunction
-        if !isnothing(sft)
-            total_scattering /= norm_val
-            sft.dft[i, 2] = total_scattering
-        end
+        total_msd /= norm_val
+        msd.wt[i, 2] = total_msd
     end
 end
 
-function _scattering(ddiff::AbstractArray, κ::AbstractFloat)
-    distance = @. √(ddiff)
-    scattering = @. sin(distance * κ) / (distance * κ)
+function difusion!(msd::MeanSquaredDisplacement, sft::SelfScatteringFunction)
+    num_particle = size(msd.displacement, 2)
 
-    return scattering
+    for i = 1:msd.naverage
+        total_msd = 0.0
+        total_scattering = 0.0
+
+        @inbounds for j = 1:(msd.naverage-i)
+            ddiff = msd.displacement[j+i, :, :] - msd.displacement[j, :, :]
+            ddiff = norm(ddiff)
+            total_msd += ddiff^2
+
+            # If needed, compute the scattering values for an isotropic system
+            total_scattering += sin(ddiff * sft.κ) / (ddiff * sft.κ)
+        end
+
+        # Normalize the MeanSquaredDisplacement
+        norm_val = num_particle * (msd.naverage - i)
+        total_msd /= norm_val
+        msd.wt[i, 2] = total_msd
+
+        # Normalize the SelfScatteringFunction
+        total_scattering /= norm_val
+        sft.dft[i, 2] = total_scattering
+    end
 end

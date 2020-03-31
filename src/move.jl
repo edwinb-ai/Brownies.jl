@@ -237,5 +237,5 @@ function move!(
 
     # Compute and normalize the MeanSquaredDisplacement and the SelfScatteringFunction
     # with all the recorded positions
-    difusion!(msd; sft = sft)
+    difusion!(msd, sft)
 end
