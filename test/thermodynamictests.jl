@@ -10,7 +10,7 @@
     # Check consistency
     @test zfac.naverage == 1000.0
     # Compute the Carnahan-Starling value
-    true_zcomp = 8.24498784197415
+    true_zcomp = 8.352786794040853
     # Check value, larger means that it needs more steps (which is the case)
     @test zfac.zval ≈ true_zcomp
 end
@@ -34,7 +34,7 @@ end
     # Check consistency
     @test zfac.naverage == 1000.0
     # Compute the Carnahan-Starling value
-    true_zcomp = 8.24498784197415
+    true_zcomp = 8.352786794040853
     # Check value, larger means that it needs more steps (which is the case)
     @test zfac.zval ≈ true_zcomp
 end

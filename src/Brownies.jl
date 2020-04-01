@@ -6,7 +6,6 @@ using RandomNumbers.PCG
 using RandomNumbers.Xorshifts
 using StaticArrays
 using DataFrames
-using LinearAlgebra: norm
 
 include("types.jl")
 export ParticleSystem,

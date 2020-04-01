@@ -164,12 +164,6 @@ mutable struct SelfScatteringFunction{V<:Integer} <: Dynamics
     κ::AbstractFloat
 end
 
-function SelfScatteringFunction(s::SimulationSystem, mt::Integer, interval::Integer)
-    dft = zeros(mt, 2)
-    # Use the standard wave number value of 6.6
-    return SelfScatteringFunction(mt, dft, 0, interval, 6.6)
-end
-
 function SelfScatteringFunction(
     s::SimulationSystem,
     mt::Integer,
