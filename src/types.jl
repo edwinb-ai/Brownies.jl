@@ -149,8 +149,28 @@ mutable struct MeanSquaredDisplacement{V<:Integer} <: Dynamics
     naverage::V
     interval::V
 end
+
 function MeanSquaredDisplacement(s::SimulationSystem, mt::Integer, interval::Integer)
     displacement = zeros(mt, s.params.N, s.dims)
     wt = zeros(mt, 2)
     return MeanSquaredDisplacement(displacement, mt, wt, 0, interval)
+end
+
+mutable struct SelfScatteringFunction{V<:Integer} <: Dynamics
+    mt::V
+    dft::AbstractArray
+    naverage::V
+    interval::V
+    κ::AbstractFloat
+end
+
+function SelfScatteringFunction(
+    s::SimulationSystem,
+    mt::Integer,
+    interval::Integer,
+    κ::AbstractFloat,
+)
+    dft = zeros(mt, 2)
+    # Use the standard wave number value of 6.6
+    return SelfScatteringFunction(mt, dft, 0, interval, κ)
 end
