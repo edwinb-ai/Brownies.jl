@@ -18,3 +18,11 @@ The current implementation can handle the following physical observables:
 - _Mean square displacement_ to study the dynamics of the molecules in the fluid following a probe particle.
 - _Structure factor_ to further study the structure of the fluid when being probed by a particle beam, using scattering properties.
 
+## TODO
+A couple of features are still **unavailable**
+
+- A complete documentation of the methods and functions.
+- Proper benchmarking.
+- CI pipeline migration to GitHub Actions.
+- Allow for _differentiable simulations_.
+
